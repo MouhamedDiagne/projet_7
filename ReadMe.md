@@ -1,4 +1,4 @@
-Ce document est une présentation globale du projet 7 sur l'analyse de sentiment du parcours AI Engineer d'OpenClassrooms.
+Ce document est une feuille de routes ainsi qu'un journal de bord dans la réalisation du projet 7 sur l'analyse de sentiment du parcours AI Engineer d'OpenClassrooms.
 
 
 
@@ -76,8 +76,15 @@ Jeu de données Open Source : tweets, informations sur les tweets, label binaire
   * on étudie maintenant le contenu lexical de notre corpus. On essaie de répondre à certaines questions telles que : quels sont les mots les plus fréquents dans notre corpus ? Existe-t-il des mots qui deviennent plus fréquent selon le sentiment associé aux tweets ?
   * en amont, on effectue une normalisation (principalement en remplaçant par des Placeholders) sur certains artifacts parmi ceux que nous avons répertorié précédemment(mentions, hashtags, lien) afin de relever uniquement les mots et expressions décrivant le contenu d'un tweet.
   * le premier résultat sur les mots les plus fréquents est prévisible : un classement dominé par les placeholders issus de notre traitement et surtout par des mots génériques de la langue généralement appelés "stopwords" (articles, pronoms, conjonctions, etc).
-  * dans un second temps, on filtre ces stopwords. On calcule ensuite une différence de fréquence relative pour chaque mot et par rapport à chaque sentiment. Autrement dit, pour chaque sentiment, on calcule la fréquence d'apparition du mot dans l'ensemble des tweets associé à ce sentiment et on fait ensuite la différence entre les deux fréquences. On obtient alors une valeur qui nous permet de classer l'ensemble des mots de notre corpus pour trouver ceux qui apparaissent plus ou moins souvent en passant d'un sentiment à l'autre.
-  * &#x20;
+  * dans un second temps, on filtre ces stopwords. On calcule ensuite une différence de fréquence relative pour chaque mot et par rapport à chaque sentiment. Autrement dit, pour chaque sentiment, on calcule la fréquence d'apparition du mot dans l'ensemble des tweets associé à ce sentiment et on fait ensuite la différence entre les deux fréquences. On obtient alors une valeur qui nous permet de classer l'ensemble des mots de notre corpus pour trouver ceux qui apparaissent plus ou moins souvent d'un sentiment à l'autre. 
+  * En allant plus loin, on peut penser que les différences de prévalence que l'on vient de calculer ne permettent pas de trouver les termes dont la fréquence d'apparition varie de manière significative entre les 2 classes de sentiment. On répond à cela en divisant la différence précédente par la valeur absolue maximale entre les deux valeurs de prévalence du terme par rapport à chaque classe de sentiment. En observant les valeurs extrêmes de cette nouvelle mesure, on trouve les mots qui apparaissent en grande majorité, et parfois exclusivement, dans les tweets associés à un unique sentiment.
+  * on réalise une étude similaire sur les expressions (bigrammes et trigrammes) afin de relever les groupes de mots les plus fréquents et leurs comportements selon la classe de sentiment. 
+  * Résultats : 
+
+    * grâce au calcul de la *"différence de prévalence relative"* pour tous les termes(ou expressions), nous avons pu relever les mots(ou groupe de mots) dont les fréquences d'apparition par rapport aux 2 classes de tweet sont les plus désequilibrées. 
+    * en observant ces termes, on observe qu'ils sont souvent des mots portant une intention ou un sentiment très clairement orientées vers une classe(positive ou négative). On peut se demander alors si, en reconnaissant ces termes ou expressions, certains modèles pourront effectuer la prédiction de la classe d'un tweet. Est-ce que cela mènera à des performances améliorées ou est-ce possible d'en arriver à des situations d'overfitting à cause de cela ?
+    * On observe aussi que les valeurs de *différence de prévalence relative* sont souvent plus grandes en valeur absolue. Donc, on pourrait poser l'hypothèse que la prévalence des termes ou expressions négatives dans les tweets négatifs est plus forte que celle des termes et expressions positive dans les tweets positifs. Cela pourrait-il induire de meilleures performance dans la classification pour les individus de la classe négative ?
+    * on confirme l'influence des artifacts, notamment les mentions, dans la classification en sentiment des tweets. Beaucoup de bigrammes ou trigrammes incluant le placeholder *user* se retrouvent dans les expressions ayant les valeurs de *différence de prévalence relative* les plus extrêmes et donc apparaissent très majoritairement dans une classe de sentiment.
 
 
 
@@ -87,5 +94,15 @@ Jeu de données Open Source : tweets, informations sur les tweets, label binaire
 
 
 
-
+* Dependencies / Setup
+* Data Import
+* Train / Validation / Test Split
+* Performance Metrics
+* Shared Benchmarking Protocol
+* TF-idf + Logistic Regression
+* GloVe + LSTM
+* Word2Vec + GRU
+* BERT + DNN
+* Final Benchmark Comparison
+* Selected Model \& Next Steps
 
