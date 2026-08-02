@@ -96,8 +96,20 @@ Jeu de données Open Source : tweets, informations sur les tweets, label binaire
 
 * Dependencies / Setup
 * Data Import
+
+  * with cp1252 encoding as done in the EDA
+  * fixed random seed.
+  * label remapping
+  * balanced sampling of 125\_000 lines
 * Train / Validation / Test Split
+
+  * stratified split
+  * rations 0.6 / 0.2 / 0.2
 * Performance Metrics
+
+  * between different epochs of training, for the model to optimize its parameters ---> log\_loss
+  * during validation, and for comparing different models or different hyperparameter configurations of a same model ---> accuracy, recall, fbeta score,
+  * for business purposes, to see the impact of each model on the problem we want to solve (badbuzz) 
 * Shared Benchmarking Protocol
 * TF-idf + Logistic Regression
 * GloVe + LSTM
