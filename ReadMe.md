@@ -131,7 +131,6 @@ Jeu de données Open Source : tweets, informations sur les tweets, label binaire
       * one run for each model type and one sub run for each model configuration
       * for each model type, one run is selected using the specified model selection rule and threshold policies.
       * each run/sub run must log : model family, model name, preprocessing type and settings, embedding model type and parameters, classifier model type and parameters, Validation Metrics, Test Metrics for the selected runs only, training time, inference time, confusion matrix artifact for selected runs, learning curves for neural networks.
-      * 
   * Model Selection Rules
 
     * during each model hyperparameter optimization, the best model must be chosen.
