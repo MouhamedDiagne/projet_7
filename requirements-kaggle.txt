@@ -4,6 +4,7 @@
 contractions>=0.1.73,<1
 emoji>=2.0,<3
 gensim>=4.3,<5
+matplotlib>=3.8,<4
 nltk>=3.8,<4
 numpy>=1.26,<3
 optuna>=4.0,<5

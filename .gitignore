@@ -1,7 +1,12 @@
 env/
-data/
+data/*
+!data/README.md
 kaggle/
-scripts/
+scripts/*
+!scripts/kaggle_pull_outputs.ps1
+!scripts/kaggle_status.ps1
+!scripts/sync_modelisation_to_kaggle.ps1
 .env
 mlruns/
 tests/
+__pycache__/
