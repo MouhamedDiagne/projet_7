@@ -1,0 +1,17 @@
+# Extra Python packages required by notebooks/modelisation.ipynb.
+# Install with: pip install --upgrade-strategy only-if-needed -r requirements-kaggle.txt
+-r requirements-tracking.txt
+contractions>=0.1.73,<1
+emoji>=2.0,<3
+gensim>=4.3,<5
+nltk>=3.8,<4
+numpy>=1.26,<3
+optuna>=4.0,<5
+pandas>=2.0,<3
+scikit-learn>=1.4,<2
+seaborn>=0.13,<1
+tqdm>=4.66,<5
+transformers>=4.40,<6
+
+# TensorFlow and PyTorch are intentionally not listed here. Kaggle supplies
+# CUDA-compatible builds; reinstalling them through pip could remove GPU support.

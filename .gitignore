@@ -2,3 +2,6 @@ env/
 data/
 kaggle/
 scripts/
+.env
+mlruns/
+tests/

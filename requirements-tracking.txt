@@ -1,0 +1,4 @@
+# Remote MLflow tracking for Databricks. Keep this dependency independent from
+# TensorFlow and PyTorch so Kaggle's GPU-compatible runtime is not replaced.
+mlflow[databricks]>=3.13,<4
+python-dotenv>=1.0,<2
