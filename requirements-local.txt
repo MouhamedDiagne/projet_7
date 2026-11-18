@@ -1,0 +1,13 @@
+# Complete local environment for the current notebook and Kaggle workflow.
+# This file deliberately extends the Kaggle-safe dependency set below rather
+# than making Kaggle reinstall its CUDA-compatible TensorFlow/PyTorch builds.
+-r requirements-kaggle.txt
+
+# Imported unconditionally by notebooks/modelisation.ipynb. PyPI provides
+# CPython 3.12 wheels for both packages.
+tensorflow>=2.16,<3
+torch>=2.2,<3
+
+# Command-line client used by scripts/sync_modelisation_to_kaggle.ps1 and the
+# companion Kaggle status/output scripts.
+kaggle>=2.2,<3

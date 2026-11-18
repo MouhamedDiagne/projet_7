@@ -4,11 +4,19 @@
 
 Le benchmark utilise exclusivement
 `training.1600000.processed.noemoticon.csv` du corpus Sentiment140. Les
-instructions de téléchargement, la source, la citation, l'encodage et la
-somme SHA-256 sont dans [`../data/README.md`](../data/README.md).
+instructions de téléchargement, la source, la citation et l'encodage sont dans
+[`../data/README.md`](../data/README.md).
 
-Le notebook vérifie cette somme avant de charger les tweets. Une différence est
-bloquante : un autre fichier pourrait rendre les résultats non comparables.
+Le notebook vérifie que le fichier attendu existe et porte le bon nom avant de
+charger les tweets.
+
+## Asset externe GloVe
+
+La famille GloVe + LSTM dépend aussi du fichier
+`glove.twitter.27B.50d.txt`. Il est attaché au notebook comme dataset Kaggle,
+jamais téléchargé implicitement. Son chemin, son nom, sa taille et sa dimension
+sont journalisés dans le run MLflow parent. Les détails de configuration sont dans
+[`05_glove_lstm_benchmark.md`](05_glove_lstm_benchmark.md).
 
 ## Seed projet
 
@@ -17,8 +25,7 @@ valeur par défaut est `42`; elle peut être changée dans `.env` local, dans un
 secret Kaggle portant ce nom, ou dans la configuration du notebook avant son
 exécution.
 
-Au démarrage, `tracking.reproducibility.configure_reproducibility()` applique
-cette valeur à :
+Au démarrage, `configure_reproducibility()` applique cette valeur à :
 
 - Python (`random`) ;
 - NumPy ;
@@ -30,6 +37,10 @@ frameworks les prennent en charge. Les résultats doivent néanmoins être
 comparés avec une tolérance : certaines opérations GPU restent susceptibles de
 présenter de légères différences numériques selon le matériel, les pilotes et
 les versions de bibliothèques.
+
+Cette fonction, ainsi que le manifeste léger du dataset, est intégrée dans la
+section `Utils` de `notebooks/modelisation.ipynb` pour l'exécution Kaggle. Les
+modules `tracking/` restent la référence réutilisable des contrôles locaux.
 
 ## Métadonnées à journaliser dans chaque run
 
@@ -43,8 +54,8 @@ with mlflow.start_run(experiment_id=tracking_config.experiment_id):
 ```
 
 `RUN_PROVENANCE_PARAMS` contient la seed, l'état des options déterministes, le
-nom et la taille du fichier, son encodage et sa SHA-256. Ces valeurs ne
-contiennent ni tweet, ni token, ni autre donnée sensible.
+nom et la taille du fichier, ainsi que son encodage. Ces valeurs ne contiennent
+ni tweet, ni token, ni autre donnée sensible.
 
 ## Vérification rapide locale
 
@@ -52,5 +63,4 @@ contiennent ni tweet, ni token, ni autre donnée sensible.
 .\env\Scripts\python.exe -c "from tracking.data_provenance import verify_sentiment140_training_file; print(verify_sentiment140_training_file('data/sentiment140/training.1600000.processed.noemoticon.csv'))"
 ```
 
-La commande doit afficher une somme commençant par
-`08cba6317a49528fcd074f9043aafcd`.
+La commande doit afficher le nom, la taille et l'encodage du fichier.

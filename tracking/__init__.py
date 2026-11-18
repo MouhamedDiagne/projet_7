@@ -1,1 +1,1 @@
-"""Reusable components for remote Databricks MLflow tracking."""
+"""Reusable MLflow tracking and provenance components."""

@@ -42,23 +42,8 @@ Le notebook attend ensuite le chemin suivant :
 data/sentiment140/training.1600000.processed.noemoticon.csv
 ```
 
-## Contrôle d'intégrité
+## Provenance enregistrée
 
-Le CSV de référence attendu par ce projet est encodé en `cp1252`, mesure
-238 803 811 octets et a l'empreinte SHA-256 suivante :
-
-```text
-08cba6317a49528fcd074f9043aafcd5ad6c6be45ede159c4e36cec33af24afe
-```
-
-Vérifier localement après extraction :
-
-```powershell
-(Get-FileHash `
-  data\sentiment140\training.1600000.processed.noemoticon.csv `
-  -Algorithm SHA256).Hash.ToLower()
-```
-
-Le notebook applique ce contrôle avant tout échantillonnage. Il ne journalise
-dans MLflow que le nom, la taille, l'encodage et l'empreinte du fichier — jamais
-le corpus brut.
+Le notebook vérifie que le fichier attendu existe et porte le nom prévu avant
+tout échantillonnage. Il journalise dans MLflow son nom, sa taille et son
+encodage `cp1252`, jamais le corpus brut.

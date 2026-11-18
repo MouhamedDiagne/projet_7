@@ -2,9 +2,6 @@ param(
     [string]$NotebookPath = "notebooks/modelisation.ipynb",
     [string]$BundlePath = "kaggle/modelisation",
     [string]$MetadataPath = "kaggle/modelisation/kernel-metadata.json",
-    [string]$TrackingPath = "tracking",
-    [string]$RequirementsPath = "requirements-kaggle.txt",
-    [string]$TrackingRequirementsPath = "requirements-tracking.txt",
     [string]$Accelerator = "",
     [switch]$SkipPush
 )
@@ -21,6 +18,25 @@ function Write-Utf8NoBom {
 
     $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
     [System.IO.File]::WriteAllText($Path, $Content, $utf8NoBom)
+}
+
+function ConvertTo-AsciiJson {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Content
+    )
+
+    # The Kaggle CLI can use the active Windows code page when reading files.
+    # Escaping all non-ASCII JSON characters keeps the bundle portable while
+    # preserving the original Unicode strings after JSON parsing on Kaggle.
+    return [System.Text.RegularExpressions.Regex]::Replace(
+        $Content,
+        '[^\x00-\x7F]',
+        {
+            param($match)
+            return ('\u{0:x4}' -f [int][char]$match.Value)
+        }
+    )
 }
 
 function Ensure-NotebookKernelspec {
@@ -42,7 +58,7 @@ function Ensure-NotebookKernelspec {
     }
 
     $notebookJson = $notebook | ConvertTo-Json -Depth 100
-    Write-Utf8NoBom -Path $Path -Content $notebookJson
+    Write-Utf8NoBom -Path $Path -Content (ConvertTo-AsciiJson -Content $notebookJson)
 }
 
 function ConvertTo-KaggleSlug {
@@ -68,6 +84,31 @@ function Assert-Command {
     }
 }
 
+function Resolve-KaggleCommand {
+    # Prefer the project virtual environment so the sync command works from a
+    # regular PowerShell session without requiring `env\Scripts\Activate.ps1`.
+    $projectRoot = Split-Path -Parent $PSScriptRoot
+    $virtualEnvironmentCandidates = @(
+        (Join-Path -Path $projectRoot -ChildPath "env\Scripts\kaggle.exe"),
+        (Join-Path -Path $projectRoot -ChildPath ".venv\Scripts\kaggle.exe")
+    )
+    foreach ($candidate in $virtualEnvironmentCandidates) {
+        if (Test-Path -LiteralPath $candidate -PathType Leaf) {
+            return (Resolve-Path -LiteralPath $candidate).Path
+        }
+    }
+
+    $command = Get-Command "kaggle" -ErrorAction SilentlyContinue
+    if ($command) {
+        return $command.Path
+    }
+
+    throw (
+        "Kaggle CLI not found. Install it in the project environment with " +
+        ".\\env\\Scripts\\python.exe -m pip install kaggle, or add a kaggle executable to PATH."
+    )
+}
+
 function Assert-File {
     param(
         [Parameter(Mandatory = $true)]
@@ -81,27 +122,12 @@ function Assert-File {
     }
 }
 
-function Assert-Directory {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$Path,
-        [Parameter(Mandatory = $true)]
-        [string]$Label
-    )
-
-    if (-not (Test-Path -LiteralPath $Path -PathType Container)) {
-        throw "$Label not found: $Path"
-    }
-}
-
+$kaggleCommand = $null
 if (-not $SkipPush) {
-    Assert-Command -CommandName "kaggle"
+    $kaggleCommand = Resolve-KaggleCommand
 }
 Assert-File -Path $NotebookPath -Label "Notebook"
 Assert-File -Path $MetadataPath -Label "Kaggle metadata"
-Assert-Directory -Path $TrackingPath -Label "Tracking package"
-Assert-File -Path $RequirementsPath -Label "Kaggle requirements file"
-Assert-File -Path $TrackingRequirementsPath -Label "Tracking requirements file"
 
 if (-not (Test-Path -LiteralPath $BundlePath -PathType Container)) {
     New-Item -ItemType Directory -Path $BundlePath -Force | Out-Null
@@ -137,34 +163,13 @@ $targetNotebookPath = Join-Path -Path $BundlePath -ChildPath $codeFileName
 # Copy the local notebook into the Kaggle bundle that will be pushed remotely.
 Copy-Item -LiteralPath $NotebookPath -Destination $targetNotebookPath -Force
 
-# Ship the shared tracking package and its dependencies with the notebook so
-# `/kaggle/working` can import them at runtime. The bundle is generated, so its
-# tracking copy is replaced rather than retaining stale source or bytecode files.
-$resolvedBundlePath = (Resolve-Path -LiteralPath $BundlePath).Path
-$targetTrackingPath = Join-Path -Path $resolvedBundlePath -ChildPath "tracking"
-if (Test-Path -LiteralPath $targetTrackingPath) {
-    $resolvedTargetTrackingPath = (Resolve-Path -LiteralPath $targetTrackingPath).Path
-    $bundlePrefix = $resolvedBundlePath.TrimEnd('\') + '\'
-    if (-not $resolvedTargetTrackingPath.StartsWith($bundlePrefix, [System.StringComparison]::OrdinalIgnoreCase)) {
-        throw "Refusing to replace a tracking bundle outside the Kaggle bundle: $resolvedTargetTrackingPath"
-    }
-    Remove-Item -LiteralPath $resolvedTargetTrackingPath -Recurse -Force
-}
-New-Item -ItemType Directory -Path $targetTrackingPath -Force | Out-Null
-Copy-Item -Path (Join-Path -Path $TrackingPath -ChildPath "*") -Destination $targetTrackingPath -Recurse -Force -Exclude "__pycache__", "*.pyc"
-
-$targetRequirementsPath = Join-Path -Path $BundlePath -ChildPath "requirements-kaggle.txt"
-Copy-Item -LiteralPath $RequirementsPath -Destination $targetRequirementsPath -Force
-$targetTrackingRequirementsPath = Join-Path -Path $BundlePath -ChildPath "requirements-tracking.txt"
-Copy-Item -LiteralPath $TrackingRequirementsPath -Destination $targetTrackingRequirementsPath -Force
-
 # Kaggle execution expects a kernelspec entry in the notebook metadata.
 Ensure-NotebookKernelspec -Path $targetNotebookPath
 
 # Keep the metadata code_file in sync with the copied notebook filename.
 $metadata.code_file = $codeFileName
 $metadataJson = $metadata | ConvertTo-Json -Depth 20
-Write-Utf8NoBom -Path $MetadataPath -Content $metadataJson
+Write-Utf8NoBom -Path $MetadataPath -Content (ConvertTo-AsciiJson -Content $metadataJson)
 
 Write-Host "Notebook copied to $targetNotebookPath"
 
@@ -178,8 +183,8 @@ if (-not [string]::IsNullOrWhiteSpace($Accelerator)) {
     $pushArgs += @("--accelerator", $Accelerator)
 }
 
-Write-Host "Running: kaggle $($pushArgs -join ' ')"
-& kaggle @pushArgs
+Write-Host "Running: $kaggleCommand $($pushArgs -join ' ')"
+& $kaggleCommand @pushArgs
 
 if ($LASTEXITCODE -ne 0) {
     throw "Kaggle push failed."

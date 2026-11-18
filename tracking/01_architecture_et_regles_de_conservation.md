@@ -21,7 +21,7 @@ l'entraînement : les calculs restent exécutés sur les GPU Kaggle.
 
 1. **Jeu de données** — Le fichier CSV brut Sentiment140 ne sera pas envoyé à
    Databricks. Chaque run journalise à la place un manifeste de provenance :
-   source et nom du jeu de données, empreinte SHA-256, encodage `cp1252`,
+   nom du jeu de données, taille du fichier, encodage `cp1252`,
    stratégie d'échantillonnage, seed, définition du split, tailles des jeux et
    distribution des classes.
 

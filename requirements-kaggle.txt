@@ -1,5 +1,7 @@
-# Extra Python packages required by notebooks/modelisation.ipynb.
-# Install with: pip install --upgrade-strategy only-if-needed -r requirements-kaggle.txt
+# Packages installed by the self-contained Kaggle notebook setup, and included
+# by requirements-local.txt for a complete local environment.
+# Do not use this file alone to reproduce the full notebook locally: TensorFlow,
+# PyTorch and the Kaggle CLI live in requirements-local.txt.
 -r requirements-tracking.txt
 contractions>=0.1.73,<1
 emoji>=2.0,<3
