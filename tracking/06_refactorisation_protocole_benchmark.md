@@ -34,7 +34,7 @@ TF-IDF + Logistic Regression et GloVe + LSTM utilisent maintenant le même proto
 
 ## Étape 8 — Adaptateurs
 
-`build_tfidf_adapter()` encapsule le pipeline scikit-learn et son modèle MLflow. `build_glove_lstm_adapter(...)` encapsule les ressources GloVe, l'historique neural, les séquences test, les artefacts d'inférence et le nettoyage TensorFlow.
+`build_tfidf_adapter()` encapsule le pipeline scikit-learn et son modèle MLflow. `build_glove_lstm_adapter(...)` encapsule les ressources GloVe, l'historique neural, les séquences test, les artefacts d'inférence et le nettoyage TensorFlow. `build_word2vec_gru_adapter(...)` fournit le même contrat pour Word2Vec + GRU, tout en préparant le modèle Word2Vec une seule fois à partir du train. `build_distilbert_adapter(...)` adapte le protocole à un backbone téléchargé depuis Hugging Face et gelé pendant l'entraînement de la tête dense.
 
 ## Étape 9 — Cellules de familles
 
@@ -42,4 +42,4 @@ Les deux grandes cellules sont désormais limitées à la construction de leur d
 
 ## Étape 10 — Invariants
 
-La refactorisation préserve les splits 60/20/20, `PROJECT_SEED`, le premier accès au test après le seuil figé, les espaces de recherche, les noms de runs/artefacts et la règle orientée détection de bad buzz. Word2Vec + GRU et les futures familles BERT devront fournir un adaptateur, sans changer le protocole commun.
+La refactorisation préserve les splits 60/20/20, `PROJECT_SEED`, le premier accès au test après le seuil figé, les espaces de recherche, les noms de runs/artefacts et la règle orientée détection de bad buzz. Word2Vec + GRU et DistilBERT + tête dense appliquent désormais ce contrat : ce sont les familles prévues pour ce benchmark.
