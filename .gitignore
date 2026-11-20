@@ -10,3 +10,4 @@ scripts/*
 mlruns/
 tests/
 __pycache__/
+api/data/*.sqlite3

@@ -57,6 +57,7 @@ Le parent run journalise le manifeste du backbone et sa configuration Transforme
 Le run final contient notamment :
 
 - `transformer_manifest.json` et `transformer_model_config.json` ;
+- `transformer_checkpoint.pt`, utilisable pour reconstruire le modèle hors du notebook ;
 - les fichiers du tokenizer sous `transformer_tokenizer/` ;
 - `preprocessing_config.json`, `sequence_config.json` et `inference_contract.json` ;
 - seuil, rapports et métriques de test ;

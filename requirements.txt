@@ -1,0 +1,3 @@
+# Azure App Service currently serves the lightweight TF-IDF + Logistic Regression release.
+# This intentionally omits the large optional Torch and Transformers dependencies.
+-r requirements-api-light.txt

@@ -1,0 +1,15 @@
+# Complete local dependency set, including the optional advanced DistilBERT mode.
+fastapi>=0.115,<1
+uvicorn[standard]>=0.30,<1
+mlflow[databricks]>=3.13,<4
+python-dotenv>=1.0,<2
+scikit-learn>=1.4,<2
+torch>=2.2,<3
+transformers>=4.40,<6
+contractions>=0.1.73,<1
+emoji>=2.0,<3
+gunicorn>=23,<24
+
+# Local test dependencies.
+pytest>=8,<9
+httpx>=0.27,<1

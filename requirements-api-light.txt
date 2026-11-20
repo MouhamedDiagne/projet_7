@@ -1,0 +1,10 @@
+# Minimal production dependencies for API_MODEL_MODE=light on Azure App Service.
+# The light mode loads only the TF-IDF + Logistic Regression MLflow artifact.
+fastapi>=0.115,<1
+uvicorn[standard]>=0.30,<1
+gunicorn>=23,<24
+mlflow[databricks]>=3.13,<4
+python-dotenv>=1.0,<2
+scikit-learn>=1.4,<2
+contractions>=0.1.73,<1
+emoji>=2.0,<3
