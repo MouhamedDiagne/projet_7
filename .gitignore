@@ -11,3 +11,6 @@ mlruns/
 tests/
 __pycache__/
 api/data/*.sqlite3
+
+instructions/
+tracking/

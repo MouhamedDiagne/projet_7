@@ -33,3 +33,20 @@ Le `requirements.txt` à la racine référence `requirements-api-light.txt`. Il 
 ## Artifacts attendus
 
 Tous les modes requièrent `selected_model` et `decision_threshold.json` dans le run parent. Le mode `advanced` reconstruit le modèle à partir de `transformer_checkpoint.pt`, `transformer_model_config.json`, `transformer_tokenizer/`, `preprocessing_config.json` et `sequence_config.json`. Ces artifacts sont journalisés par la version actuelle du benchmark DistilBERT ; exécuter cette version avant de sélectionner le run avancé de l'API.
+
+## CI/CD GitHub Actions vers Azure
+
+Le workflow `.github/workflows/api-ci-cd.yml` teste l'API sur les pull requests vers `main`, les push sur `main` et les lancements manuels. Après réussite des tests, seuls les push sur `main` et les lancements manuels depuis `main` déploient le mode light sur `oc-project-7`. Les déploiements sont sérialisés et vérifient `/health` pendant 10 minutes au maximum. Si la variable GitHub Actions `LIGHT_MODEL_RUN_ID` est définie, elle doit correspondre au run chargé ; sinon le contrôle exige seulement un run identifié en mode light. Ce contrôle échoue sans retour arrière automatique.
+
+Le workflow empaquette uniquement `api/app`, `requirements.txt` et `requirements-api-light.txt` ; il ne déploie ni `.env` ni la base SQLite locale. L'App Service doit conserver `SCM_DO_BUILD_DURING_DEPLOYMENT=true`, sa commande de démarrage et ses variables Databricks. Le `DATABRICKS_TOKEN` reste dans Azure et n'est pas nécessaire à GitHub Actions.
+
+Pour autoriser GitHub à déployer, configurer une identité Azure fédérée OIDC avec :
+
+- issuer : `https://token.actions.githubusercontent.com` ;
+- subject : `repo:MouhamedDiagne/projet_7:ref:refs/heads/main` ;
+- audience : `api://AzureADTokenExchange` ;
+- rôle `Website Contributor` limité à la Web App `oc-project-7`.
+
+Dans GitHub, sous **Settings → Secrets and variables → Actions**, créer les secrets `AZURE_CLIENT_ID`, `AZURE_TENANT_ID` et `AZURE_SUBSCRIPTION_ID` avec les identifiants de cette identité et de la souscription. On peut aussi définir la variable facultative `LIGHT_MODEL_RUN_ID` avec le même run que dans l'App Service pour vérifier la release après déploiement. Ces identifiants OIDC sont distincts du token Databricks.
+
+Le workflow doit être commité et poussé pour s'exécuter. Après le premier déploiement, vérifier les logs GitHub Actions, puis appeler `/predict` et `/feedback` manuellement : les tests isolés et `/health` ne valident pas à eux seuls une prédiction réelle.
