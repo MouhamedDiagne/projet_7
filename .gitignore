@@ -8,9 +8,9 @@ scripts/*
 !scripts/sync_modelisation_to_kaggle.ps1
 .env
 mlruns/
-tests/
+./tests/
 __pycache__/
 api/data/*.sqlite3
 
 instructions/
-tracking/
+./tracking/
